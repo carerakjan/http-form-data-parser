@@ -5,22 +5,18 @@ var util = require('util');
 http.createServer(function(req, res) {
     if (req.url === '/upload' && req.method === 'POST') {
 
-        var parser = getformParseStrategy(req);
+        var form = getformParseStrategy(req);
 
-        if(parser) {
+        if(form) {
 
             res.writeHead(200, {'content-type': 'text/plain'});
 
-            parser.on('form:progress', loadedSize => {
-                res.write((loadedSize/1024).toFixed(2) + 'Kb\n');
-            });
-
-            parser.on('form:error', err => {
-               console.log(err);
-            });
-
-            parser.on('form:parse', data => {
+            form.on('complete', data => {
                 res.end(util.inspect(data));
+            });
+
+            form.on('error', err => {
+               console.log(err);
             });
         }
 
